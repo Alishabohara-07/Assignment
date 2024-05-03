@@ -1,0 +1,71 @@
+import numpy as np
+import random
+import pickle
+import os
+
+# Create example arrays
+arrays1 = [np.random.rand(3, 2) for _ in range(20)]
+arrays2 = [np.random.rand(2, 3) for _ in range(20)]
+
+# Save arrays to files
+np.save('file1.npy', arrays1)
+np.save('file2.npy', arrays2)
+
+# Check if files exist
+file1_path = 'file1.npy'
+file2_path = 'file2.npy'
+
+if os.path.exists(file1_path) and os.path.exists(file2_path):
+    print("Both files exist.")
+else:
+    print("One or both files do not exist.")
+
+# Load arrays from files
+file1_arrays = np.load(file1_path, allow_pickle=True)
+file2_arrays = np.load(file2_path, allow_pickle=True)
+
+# Function to play the game
+def play_game(player_name):
+    player_score = 0
+    for _ in range(5):
+        # Randomly select one array from each file
+        array1 = random.choice(file1_arrays)
+        array2 = random.choice(file2_arrays)
+        
+        # Ask the player to calculate the dot product
+        print("Calculate the dot product of the following arrays:")
+        print("Array 1:\n", array1)
+        print("Array 2:\n", array2)
+        
+        # Get player's answer
+        try:
+            player_answer = int(input("Enter your answer: "))
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
+            continue
+        
+        # Calculate correct answer
+        correct_answer = np.dot(array1, array2).sum()
+        
+        # Check if player's answer is correct
+        if player_answer == correct_answer:
+            print("Correct!")
+            player_score += 1
+        else:
+            print("Incorrect!")
+    
+    return player_score
+
+# Play the game for each player
+players = {}
+num_players = int(input("Enter the number of players: "))
+for i in range(1, num_players + 1):
+    player_name = input(f"Enter name of Player {i}: ")
+    player_score = play_game(player_name)
+    players[player_name] = player_score
+
+# Save player information to a file
+with open('player_info.pkl', 'wb') as f:
+    pickle.dump(players, f)
+
+print("Player information saved.")
